@@ -187,47 +187,9 @@ Then insert 5 newly selected route airports into `player_route_airports`.
       ]
     }
 
-### Error example
-
-    {
-      "success": false,
-      "error": "Airport already opened"
-    }
-
-### Another error example
-
-    {
-      "success": false,
-      "error": "Airport is not in current route"
-    }
-
 ---
 
 # Database Schema
-
-## 1) `countries`
-
-    CREATE TABLE countries (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        code CHAR(2) NOT NULL UNIQUE,
-        name VARCHAR(100) NOT NULL
-    );
-
----
-
-## 2) `airports`
-
-    CREATE TABLE airports (
-        id BIGINT AUTO_INCREMENT PRIMARY KEY,
-        icao_code CHAR(4) NOT NULL UNIQUE,
-        name VARCHAR(150) NOT NULL,
-        country_id BIGINT NOT NULL,
-        latitude DECIMAL(9,6) NULL,
-        longitude DECIMAL(9,6) NULL,
-        FOREIGN KEY (country_id) REFERENCES countries(id)
-    );
-
----
 
 ## 3) `players`
 
