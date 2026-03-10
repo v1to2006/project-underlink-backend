@@ -1,0 +1,23 @@
+services:
+  db:
+    image: mariadb:11.8
+    container_name: deep_drift_db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword
+      MARIADB_DATABASE: deep_drift
+      MARIADB_USER: game_user
+      MARIADB_PASSWORD: game_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  mariadb_data:
