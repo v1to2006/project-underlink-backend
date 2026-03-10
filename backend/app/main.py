@@ -68,6 +68,50 @@ def home():
     return "deep drift backend running"
 
 
+@app.get("/airport")
+def airport():
+    icao_code = (request.args.get("icao_code") or "").strip().upper()
+
+    if not icao_code:
+        return bad_request("icao_code is required")
+
+    with get_cursor() as (_, cursor):
+        cursor.execute(
+            """
+            SELECT
+                a.id,
+                a.ident AS icao_code,
+                a.type,
+                a.name,
+                a.latitude_deg,
+                a.longitude_deg,
+                a.elevation_ft,
+                a.continent,
+                a.iso_country AS country_code,
+                c.name AS country_name,
+                a.iso_region,
+                a.municipality,
+                a.scheduled_service,
+                a.gps_code,
+                a.iata_code,
+                a.local_code,
+                a.home_link,
+                a.wikipedia_link,
+                a.keywords
+            FROM airport a
+            LEFT JOIN country c ON c.iso_country = a.iso_country
+            WHERE a.ident = %s
+            """,
+            (icao_code,),
+        )
+        airport_row = cursor.fetchone()
+
+    if airport_row is None:
+        return bad_request("Airport not found", 404)
+
+    return jsonify(airport_row)
+
+
 @app.post("/login")
 def login():
     payload = request.get_json(silent=True) or {}
@@ -134,13 +178,13 @@ def start():
         if len(selected_airports) < 5:
             return bad_request("not enough airports in database", 500)
 
-        for index, airport in enumerate(selected_airports, start=1):
+        for index, airport_row in enumerate(selected_airports, start=1):
             cursor.execute(
                 """
                 INSERT INTO player_route_airports (player_id, airport_ident, order_index)
                 VALUES (%s, %s, %s)
                 """,
-                (player["id"], airport["icao_code"], index),
+                (player["id"], airport_row["icao_code"], index),
             )
 
     return jsonify(
@@ -148,11 +192,11 @@ def start():
             "route": [
                 {
                     "order_index": index,
-                    "icao_code": airport["icao_code"],
-                    "name": airport["name"],
-                    "country_code": airport["country_code"],
+                    "icao_code": airport_row["icao_code"],
+                    "name": airport_row["name"],
+                    "country_code": airport_row["country_code"],
                 }
-                for index, airport in enumerate(selected_airports, start=1)
+                for index, airport_row in enumerate(selected_airports, start=1)
             ],
             "progress_index": 0,
             "completed": False,
@@ -241,7 +285,7 @@ def update():
             """,
             (player["id"],),
         )
-        opened_airports = [row["icao_code"] for row in cursor.fetchall()]
+        opened_airports = [opened_row["icao_code"] for opened_row in cursor.fetchall()]
 
     return jsonify(
         {
