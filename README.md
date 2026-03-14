@@ -25,7 +25,7 @@ That file contains the backend design overview, including:
 * how `/start` resets expedition state
 * how `/update` advances airport progress
 * the database schema for players and route tracking
-* the overall prototype structure
+* the overall structure
 
 If you want to understand how the backend is supposed to work before editing code, start there.
 
@@ -110,4 +110,3 @@ The exact schema and flow notes are documented in [design.md](design.md).
 * The Flask backend is started manually.
 * If you change SQL init files and want a full clean re-init, remove the database volume and recreate the container.
 * This backend is meant to be used together with the Godot client repository.
-* `design.md` is the main architecture note for the current prototype.
