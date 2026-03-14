@@ -2,7 +2,11 @@
 
 Backend service for the Project UNDERLINK / DEEP DRIFT game client.
 
-It provides:
+## Game Client Repository
+
+[https://github.com/v1to2006/project-underlink-godot](https://github.com/v1to2006/project-underlink-godot)
+
+Backend provides:
 
 * player login and save loading
 * new expedition generation
